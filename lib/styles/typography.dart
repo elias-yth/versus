@@ -71,16 +71,14 @@ class H4 extends StatelessWidget {
 
 class P extends StatelessWidget {
   final String text;
-  final TextAlign? textAlign;
   final Color? color;
 
-  const P(this.text, {this.textAlign, this.color, super.key});
+  const P(this.text, {this.color, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
-      textAlign: textAlign ?? TextAlign.center,
       style: TextStyle(fontSize: 22, color: color ?? AppColors.text),
     );
   }

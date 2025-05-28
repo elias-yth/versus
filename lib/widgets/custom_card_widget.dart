@@ -24,6 +24,7 @@ class CustomCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         color: color ?? AppColors.cardBackground,
       ),
+      child: child,
     );
   }
 }

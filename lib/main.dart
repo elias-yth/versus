@@ -26,8 +26,8 @@ class MyApp extends StatelessWidget {
       home: LandingPage(),
       routes: {
         '/home': (context) => const LandingPage(),
-        '/matchup': (context) => const MatchupPage(),
-        '/test': (context) => const TestPage(),
+        '/matchup': (context) => MatchupPage(),
+        '/test': (context) => TestPage(),
       },
     );
   }
