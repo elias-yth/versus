@@ -5,8 +5,18 @@ import 'package:versus/widgets/big_button_widget.dart';
 import 'package:versus/widgets/custom_card_widget.dart';
 import 'package:versus/widgets/player_icon_widget.dart';
 
-class MatchupPage extends StatelessWidget {
-  List<String> myList = [
+class MatchupPage extends StatefulWidget {
+  const MatchupPage({super.key});
+
+  @override
+  State<MatchupPage> createState() => _MatchupPageState();
+}
+
+class _MatchupPageState extends State<MatchupPage> {
+  List<String> teamOne = ['Luke', 'Elias'];
+  List<String> teamTwo = ['Leopold'];
+  List<String> playerPool = [
+    'add',
     'Elias',
     'Leopold',
     'Fenchel',
@@ -19,7 +29,36 @@ class MatchupPage extends StatelessWidget {
     'Emily',
   ];
 
-  MatchupPage({super.key});
+  bool isTeamFull(List team) {
+    if (team.length < 2) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  void addToMatchup(String player) {
+    if (!isTeamFull(teamOne)) {
+      setState(() {
+        teamOne.add(player);
+        playerPool.remove(player);
+      });
+    } else if (!isTeamFull(teamTwo)) {
+      setState(() {
+        teamTwo.add(player);
+        playerPool.remove(player);
+      });
+    } else {
+      print('team already full');
+    }
+  }
+
+  void removeFromTeam(List team, String player) {
+    setState(() {
+      playerPool.add(player);
+      team.remove(player);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +71,14 @@ class MatchupPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
-              children: [teams(), SizedBox(height: 20), playerSelection()],
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [team(teamOne), H3('VS'), team(teamTwo)],
+                ),
+                const SizedBox(height: 10),
+                playerSelection(),
+              ],
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 100.0),
@@ -50,23 +96,70 @@ class MatchupPage extends StatelessWidget {
   }
 
   Widget teams() {
-    return CustomCard(height: 100, width: 370);
-  }
-
-  Widget playerSelection() {
     return CustomCard(
-      height: 500,
-      width: 370,
+      height: 300,
+      width: 500,
       child: SizedBox(
         height: 400,
         width: 350,
         child: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 4,
           ),
-          itemCount: myList.length,
+          itemCount: teamTwo.length,
           itemBuilder: (context, index) {
-            return PlayerIcon(display: myList[index]);
+            return PlayerIcon(
+              display: teamTwo[index],
+              onPressed: () => addToMatchup(teamTwo[index]),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget team(List team) {
+    return CustomCard(
+      height: 80,
+      width: 160,
+      child: SizedBox(
+        // height: 90,
+        // width: 100,
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+          ),
+          itemCount: team.length,
+          itemBuilder: (context, index) {
+            return PlayerIcon(
+              display: team[index],
+              size: 44,
+              onPressed: () => removeFromTeam(team, team[index]),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget playerSelection() {
+    return CustomCard(
+      height: 300,
+      width: 500,
+      child: SizedBox(
+        height: 400,
+        width: 350,
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+          ),
+          itemCount: playerPool.length,
+          itemBuilder: (context, index) {
+            return PlayerIcon(
+              display: playerPool[index],
+              // size: 40,
+              onPressed: () => addToMatchup(playerPool[index]),
+            );
           },
         ),
       ),

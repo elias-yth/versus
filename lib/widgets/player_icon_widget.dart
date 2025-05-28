@@ -4,39 +4,55 @@ import 'package:versus/styles/typography.dart';
 
 class PlayerIcon extends StatelessWidget {
   final String display;
+  final VoidCallback onPressed;
+  final double? size;
   final Widget? child;
-  const PlayerIcon({super.key, required this.display, this.child});
+  const PlayerIcon({
+    super.key,
+    required this.display,
+    this.child,
+    required this.onPressed,
+    this.size,
+  });
 
   @override
   Widget build(BuildContext context) {
-    double iconHeight = 50;
+    double iconSize = size ?? 50;
     double subTextHeight = 20;
-    double totalHeight = iconHeight + subTextHeight;
+    double totalHeight = iconSize + subTextHeight;
 
     return TextButton(
-      onPressed: () {
-        // func
-      },
+      // TODO: find solution for add button
+      onPressed: onPressed,
       child: SizedBox(
         height: totalHeight,
-        width: 70,
+        width: iconSize,
         child: Column(
           children: [
             Align(
               alignment: Alignment.topCenter,
               child: Container(
-                height: 50,
-                width: 50,
+                height: iconSize,
+                width: iconSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.background,
                 ),
-                child: H4(display[0]),
+                child:
+                    display == '+' || display == 'add'
+                        ? H4('+', color: Colors.blueAccent)
+                        : H4(display[0]),
               ),
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: SizedBox(height: 20, child: P(display)),
+              child: SizedBox(
+                height: 20,
+                child:
+                    display == '+' || display == 'add'
+                        ? P('add', color: Colors.blueAccent)
+                        : P(display),
+              ),
             ),
           ],
         ),
