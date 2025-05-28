@@ -7,17 +7,25 @@ class FirestoreService {
   );
 
   // CREATE
-  Future<void> addPlayer(String nickname, String firstName, String lastName) {
+  Future<void> addPlayer(
+    String playerName,
+    // String firstName,
+    // String lastName
+  ) {
     return players.add({
       // 'id': initId(players),
-      'playerName': nickname,
-      'firstName': firstName,
-      'lastName': lastName,
+      'playerName': playerName,
+      // 'firstName': firstName,
+      // 'lastName': lastName,
       'createdAt': Timestamp.now(),
     });
   }
 
   // READ
+  Stream<QuerySnapshot> getPlayersStream() {
+    final playersStream = players.snapshots();
+    return playersStream;
+  }
 
   // UPDATE
 
