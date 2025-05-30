@@ -106,25 +106,39 @@ class _MatchupPageState extends State<MatchupPage> {
 
   Widget team(List team) {
     return CustomCard(
-      height: 80,
+      height: 100,
       width: 160,
       child: SizedBox(
-        // height: 90,
-        // width: 100,
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-          ),
+        height: 100,
+        width: 160,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
           itemCount: team.length,
           itemBuilder: (context, index) {
             return PlayerIcon(
               display: team[index],
-              size: 44,
               onPressed: () => removeFromTeam(team, team[index]),
             );
           },
         ),
       ),
+      // child: SizedBox(
+      //   // height: 90,
+      //   // width: 100,
+      //   child: GridView.builder(
+      //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      //       crossAxisCount: 2,
+      //     ),
+      //     itemCount: team.length,
+      //     itemBuilder: (context, index) {
+      //       return PlayerIcon(
+      //         display: team[index],
+      //         size: 44,
+      //         onPressed: () => removeFromTeam(team, team[index]),
+      //       );
+      //     },
+      //   ),
+      // ),
     );
   }
 
