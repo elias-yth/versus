@@ -5,10 +5,20 @@ import 'package:versus/firebase_options.dart';
 import 'package:versus/pages/landing_page.dart';
 import 'package:versus/pages/matchup_page.dart';
 import 'package:versus/pages/test_page.dart';
+import 'package:versus/services/firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  final firestoreService = FirestoreService();
+  // Example: print all players
+  firestoreService.getPlayersStream().listen((players) {
+    for (var player in players) {
+      print('Player: ${player.name}, ${player.id}, ${player.createdAt} ');
+    }
+  });
+
   runApp(const MyApp());
 }
 
@@ -26,7 +36,7 @@ class MyApp extends StatelessWidget {
       home: LandingPage(),
       routes: {
         '/home': (context) => const LandingPage(),
-        '/matchup': (context) => MatchupPage(),
+        '/matchup': (context) => MatchupPage(players: []),
         '/test': (context) => TestPage(),
       },
     );

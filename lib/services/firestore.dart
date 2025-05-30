@@ -1,97 +1,73 @@
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-class Player {
-  final String id;
-  final String playerName;
-  final Timestamp createdAt;
-
-  Player({required this.id, required this.playerName, required this.createdAt});
-
-  /// Parses Firestore map into Player object
-  factory Player.fromMap(Map<String, dynamic> map) {
-    return Player(
-      id: map['id'] ?? '',
-      playerName: map['playerName'] ?? '',
-      createdAt: map['createdAt'] ?? Timestamp.now(),
-    );
-  }
-
-  /// Converts Player object to Firestore-friendly map
-  Map<String, dynamic> toMap() {
-    return {'id': id, 'playerName': playerName, 'createdAt': createdAt};
-  }
-
-  /// Optional: toString for easy debugging
-  @override
-  String toString() {
-    return 'Player(id: $id, playerName: $playerName, createdAt: $createdAt)';
-  }
-}
+import 'package:versus/models/player.dart';
+import 'package:versus/models/match.dart';
 
 class FirestoreService {
-  // GET
-  final CollectionReference players = FirebaseFirestore.instance.collection(
-    'players',
-  );
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // CREATE
-  Future<void> addPlayer(String playerName) async {
-    final id = await _initId();
-    await players.add({
-      'id': id,
-      'playerName': playerName,
-      'createdAt': Timestamp.now(),
-    });
+  // ========== MATCHES ==========
+
+  Future<void> createMatch(Match match) async {
+    await _db.collection('matches').doc(match.id).set(match.toMap());
   }
 
-  // READ ONCE
-  Future<List<Player>> getPlayersOnce() async {
-    final snapshot = await players.get();
-
-    return snapshot.docs.map((doc) {
-      final data = doc.data() as Map<String, dynamic>;
-      return Player(
-        id: data['id'] ?? doc.id,
-        playerName: data['playerName'] ?? '',
-        createdAt: data['createdAt'] ?? Timestamp.now(),
-      );
-    }).toList();
+  Future<Match> getMatch(String matchId) async {
+    final doc = await _db.collection('matches').doc(matchId).get();
+    if (!doc.exists) throw Exception('Match not found: $matchId');
+    return Match.fromMap(doc.id, doc.data()!);
   }
 
-  // READ
-  Stream<QuerySnapshot> getPlayersStream() {
-    final playersStream = players.snapshots();
-    return playersStream;
+  Stream<List<Match>> getMatchesStream() {
+    return _db
+        .collection('matches')
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs
+                  .map((doc) => Match.fromMap(doc.id, doc.data()))
+                  .toList(),
+        );
   }
 
-  final Random _random = Random();
-
-  // PRIVATE: Generate unique 6-char ID
-  Future<String> _initId() async {
-    const chars =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    String getRandomId() =>
-        List.generate(
-          6,
-          (index) => chars[_random.nextInt(chars.length)],
-        ).join();
-
-    while (true) {
-      final candidate = getRandomId();
-
-      final existing =
-          await players.where('id', isEqualTo: candidate).limit(1).get();
-
-      if (existing.docs.isEmpty) {
-        return candidate;
-      }
-    }
+  Future<void> updateMatch(Match match) async {
+    await _db.collection('matches').doc(match.id).update(match.toMap());
   }
 
-  // UPDATE
+  Future<void> deleteMatch(String matchId) async {
+    await _db.collection('matches').doc(matchId).delete();
+  }
 
-  // DELETE
+  // ========== PLAYERS ==========
+
+  Future<void> createPlayer(Player player) async {
+    await _db.collection('players').doc(player.id).set(player.toMap());
+  }
+
+  Future<Player> getPlayer(String playerId) async {
+    final doc = await _db.collection('players').doc(playerId).get();
+    if (!doc.exists) throw Exception('Player not found: $playerId');
+    return Player.fromMap(doc.id, doc.data()!);
+  }
+
+  Stream<List<Player>> getPlayersStream() {
+    return _db
+        .collection('players')
+        .orderBy('name')
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs
+                  .map((doc) => Player.fromMap(doc.id, doc.data()))
+                  .toList(),
+        );
+  }
+
+  Future<void> updatePlayer(Player player) async {
+    await _db.collection('players').doc(player.id).update(player.toMap());
+  }
+
+  Future<void> deletePlayer(String playerId) async {
+    await _db.collection('players').doc(playerId).delete();
+  }
 }

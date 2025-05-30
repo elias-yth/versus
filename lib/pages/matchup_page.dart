@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:versus/models/player.dart';
 import 'package:versus/services/firestore.dart';
 import 'package:versus/styles/colors.dart';
 import 'package:versus/styles/typography.dart';
@@ -6,10 +7,16 @@ import 'package:versus/widgets/big_button_widget.dart';
 import 'package:versus/widgets/custom_card_widget.dart';
 import 'package:versus/widgets/dialogs/dialogs.dart'
     show addPlayerDialog; // specify which dialogs should be imported!
+import 'package:versus/widgets/player_grid_widget.dart';
 import 'package:versus/widgets/player_icon_widget.dart';
 
 class MatchupPage extends StatefulWidget {
-  const MatchupPage({super.key});
+  final List<Player> players;
+  const MatchupPage({
+    super.key,
+    // required List<Player> players,
+    required this.players,
+  });
 
   @override
   State<MatchupPage> createState() => _MatchupPageState();
@@ -18,16 +25,15 @@ class MatchupPage extends StatefulWidget {
 class _MatchupPageState extends State<MatchupPage> {
   final FirestoreService firestoreService = FirestoreService();
 
-  List<String> teamOne = [];
-  List<String> teamTwo = [];
-  List<String> playerPool = [
-    'Jette',
-    'Fenchel',
-    'Linne',
-    'Leopold',
-    'Luke',
-    'Elias',
-  ];
+  List<Player> teamOne = [];
+  List<Player> teamTwo = [];
+  List<Player> playerPool = [];
+
+  @override
+  void initState() {
+    super.initState();
+    playerPool = List<Player>.from(widget.players);
+  }
 
   final TextEditingController textController = TextEditingController();
 
@@ -39,9 +45,10 @@ class _MatchupPageState extends State<MatchupPage> {
     }
   }
 
-  void addToMatchup(String player) {
+  void addToMatchup(Player player) {
     if (!isTeamFull(teamOne)) {
       setState(() {
+        print('tried adding player to teamOne');
         teamOne.add(player);
         playerPool.remove(player);
       });
@@ -56,7 +63,7 @@ class _MatchupPageState extends State<MatchupPage> {
   }
 
   // TODO: ADD PLAYER TO START OF PLAYERPOOL LIST
-  void removeFromTeam(List team, String player) {
+  void removeFromTeam(List<Player> team, Player player) {
     setState(() {
       playerPool.add(player);
       team.remove(player);
@@ -104,23 +111,19 @@ class _MatchupPageState extends State<MatchupPage> {
     );
   }
 
-  Widget team(List team) {
+  Widget team(List<Player> team) {
     return CustomCard(
       height: 100,
       width: 160,
-      child: SizedBox(
-        height: 100,
-        width: 160,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: team.length,
-          itemBuilder: (context, index) {
-            return PlayerIcon(
-              display: team[index],
-              onPressed: () => removeFromTeam(team, team[index]),
-            );
-          },
-        ),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: team.length,
+        itemBuilder: (context, index) {
+          return PlayerIcon(
+            display: team[index].name,
+            onPressed: () => removeFromTeam(team, team[index]),
+          );
+        },
       ),
     );
   }
@@ -132,31 +135,7 @@ class _MatchupPageState extends State<MatchupPage> {
       child: SizedBox(
         height: 400,
         width: 350,
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-          ),
-          itemCount: playerPool.length + 1,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return PlayerIcon(
-                display: '+',
-                onPressed:
-                    () => addPlayerDialog(
-                      context,
-                      firestoreService,
-                      textController,
-                    ),
-              );
-            } else {
-              return PlayerIcon(
-                display: playerPool[index - 1],
-                // size: 40,
-                onPressed: () => addToMatchup(playerPool[index - 1]),
-              );
-            }
-          },
-        ),
+        child: PlayerGrid(players: playerPool, onPlayerTap: addToMatchup),
       ),
     );
   }

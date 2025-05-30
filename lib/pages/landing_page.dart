@@ -1,10 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:versus/models/player.dart';
+import 'package:versus/pages/matchup_page.dart';
+import 'package:versus/services/firestore.dart';
 import 'package:versus/styles/colors.dart';
 import 'package:versus/styles/typography.dart';
 import 'package:versus/widgets/big_button_widget.dart';
 
-class LandingPage extends StatelessWidget {
+class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
+
+  @override
+  State<LandingPage> createState() => _LandingPageState();
+}
+
+class _LandingPageState extends State<LandingPage> {
+  final _firestoreService = FirestoreService();
+  List<Player>? _players;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlayersOnce();
+  }
+
+  Future<void> _loadPlayersOnce() async {
+    try {
+      final stream = _firestoreService.getPlayersStream();
+      final firstSnapshot = await stream.first;
+      if (mounted) {
+        setState(() {
+          _players = firstSnapshot;
+        });
+      }
+    } catch (e) {
+      print('Error loading players: $e');
+    }
+  }
+
+  void _onGetStartedPressed() {
+    if (_players == null) {
+      print('Players not loaded yet!');
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MatchupPage(players: _players!)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +68,7 @@ class LandingPage extends StatelessWidget {
                   width: double.infinity,
                   child: BigButton(
                     color: AppColors.secondary,
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/matchup');
-                    },
+                    onPressed: _onGetStartedPressed,
                     child: H3('get started'),
                   ),
                 ),

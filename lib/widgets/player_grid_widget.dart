@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:versus/services/firestore.dart';
+import 'package:versus/models/player.dart';
 import 'package:versus/widgets/player_icon_widget.dart';
 
 class PlayerGrid extends StatelessWidget {
@@ -43,7 +43,7 @@ class PlayerGrid extends StatelessWidget {
           final player = players[playerIndex];
 
           return PlayerIcon(
-            display: player.playerName,
+            display: player.name,
             onPressed: () => onPlayerTap(player),
           );
         },
