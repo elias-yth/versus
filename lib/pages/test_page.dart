@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:versus/styles/colors.dart';
 import 'package:versus/styles/typography.dart';
+import 'package:versus/widgets/big_button_widget.dart';
 import 'package:versus/widgets/player_icon_widget.dart';
+import 'package:versus/services/firestore.dart';
 
 class TestPage extends StatefulWidget {
   const TestPage({super.key});
@@ -11,34 +13,43 @@ class TestPage extends StatefulWidget {
 }
 
 class _TestPageState extends State<TestPage> {
-  void addPlayer(String player) {
-    if (matchup.length < 4) {
-      setState(() {
-        matchup.add(player);
-        playerPool.remove(player);
-      });
-    } else {
-      print('team already full');
-    }
+  final FirestoreService firestoreService = FirestoreService();
+  final TextEditingController textEditingController = TextEditingController();
+
+  void addPlayerDialog() {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            content: TextField(
+              controller: textEditingController,
+              style: TextStyle(fontFamily: 'Roboto'),
+            ),
+            actions: [
+              BigButton(
+                onPressed: () {
+                  firestoreService.addPlayer(textEditingController.text);
+                  textEditingController.clear();
+                  Navigator.pop(context);
+                  // setState(() {
+                  //   playerPool.add(textEditingController.text);
+                  // });
+
+                  // checks for empty user input
+                  // textEditingController.text.trim().isEmpty
+                  //     ? print('empty string')
+                  //     : () {
+                  //       firestoreService.addPlayer(textEditingController.text);
+                  //       textEditingController.clear();
+                  //       Navigator.pop(context);
+                  //     };
+                },
+                child: H3('add player'),
+              ),
+            ],
+          ),
+    );
   }
-
-  void removePlayer(String player) {
-    setState(() {
-      matchup.add(player);
-      playerPool.remove(player);
-    });
-  }
-
-  List<String> matchup = ['Josh'];
-
-  List<String> playerPool = [
-    'Elias',
-    'Luke',
-    'Fenchel',
-    'Luca',
-    'Linne',
-    'Leopold',
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -48,28 +59,8 @@ class _TestPageState extends State<TestPage> {
         title: H2('TESTPAGE'),
       ),
       backgroundColor: AppColors.background,
-      body: Row(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: playerPool.length,
-              itemBuilder: (context, index) {
-                return PlayerIcon(
-                  display: playerPool[index],
-                  onPressed: () => addPlayer(playerPool[index]),
-                );
-              },
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: matchup.length,
-              itemBuilder: (context, index) {
-                return ListTile(title: Text(matchup[index]));
-              },
-            ),
-          ),
-        ],
+      body: Center(
+        child: TextButton(onPressed: addPlayerDialog, child: H3('ADD BUTTON')),
       ),
     );
   }

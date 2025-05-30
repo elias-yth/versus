@@ -4,6 +4,8 @@ import 'package:versus/styles/colors.dart';
 import 'package:versus/styles/typography.dart';
 import 'package:versus/widgets/big_button_widget.dart';
 import 'package:versus/widgets/custom_card_widget.dart';
+import 'package:versus/widgets/dialogs/dialogs.dart'
+    show addPlayerDialog; // specify which dialogs should be imported!
 import 'package:versus/widgets/player_icon_widget.dart';
 
 class MatchupPage extends StatefulWidget {
@@ -16,39 +18,18 @@ class MatchupPage extends StatefulWidget {
 class _MatchupPageState extends State<MatchupPage> {
   final FirestoreService firestoreService = FirestoreService();
 
-  List<String> teamOne = ['Luke', 'Elias'];
-  List<String> teamTwo = ['Leopold'];
-  List<String> playerPool = ['Jette', 'Fenchel', 'Linne'];
+  List<String> teamOne = [];
+  List<String> teamTwo = [];
+  List<String> playerPool = [
+    'Jette',
+    'Fenchel',
+    'Linne',
+    'Leopold',
+    'Luke',
+    'Elias',
+  ];
 
-  final TextEditingController textEditingController = TextEditingController();
-
-  void addPlayerDialog() {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            content: TextField(
-              controller: textEditingController,
-              style: TextStyle(fontFamily: 'Roboto'),
-            ),
-            actions: [
-              BigButton(
-                onPressed: () {
-                  firestoreService.players.add({
-                    'playerName': textEditingController.text,
-                  });
-                  // setState(() {
-                  //   playerPool.add(textEditingController.text);
-                  // });
-                  textEditingController.clear;
-                  Navigator.pop(context);
-                },
-                child: H3('add player'),
-              ),
-            ],
-          ),
-    );
-  }
+  final TextEditingController textController = TextEditingController();
 
   bool isTeamFull(List team) {
     if (team.length < 2) {
@@ -74,6 +55,7 @@ class _MatchupPageState extends State<MatchupPage> {
     }
   }
 
+  // TODO: ADD PLAYER TO START OF PLAYERPOOL LIST
   void removeFromTeam(List team, String player) {
     setState(() {
       playerPool.add(player);
@@ -93,17 +75,23 @@ class _MatchupPageState extends State<MatchupPage> {
           children: [
             Column(
               children: [
+                // CURRENT TEAM DISPLAY
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [team(teamOne), H3('VS'), team(teamTwo)],
                 ),
                 const SizedBox(height: 10),
+
+                // PLAYER POOL
                 playerSelection(),
               ],
             ),
+
+            // START MATCH BUTTON
             Padding(
               padding: const EdgeInsets.only(bottom: 100.0),
               child: BigButton(
+                // TODO: update 'lastPlayed' property for players in teamOne and teamTwo
                 onPressed: () {
                   Navigator.pushNamed(context, '/test');
                 },
@@ -156,7 +144,12 @@ class _MatchupPageState extends State<MatchupPage> {
             if (index == 0) {
               return PlayerIcon(
                 display: '+',
-                onPressed: () => addPlayerDialog(),
+                onPressed:
+                    () => addPlayerDialog(
+                      context,
+                      firestoreService,
+                      textController,
+                    ),
               );
             } else {
               return PlayerIcon(
