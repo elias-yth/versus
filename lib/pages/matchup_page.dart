@@ -122,23 +122,6 @@ class _MatchupPageState extends State<MatchupPage> {
           },
         ),
       ),
-      // child: SizedBox(
-      //   // height: 90,
-      //   // width: 100,
-      //   child: GridView.builder(
-      //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      //       crossAxisCount: 2,
-      //     ),
-      //     itemCount: team.length,
-      //     itemBuilder: (context, index) {
-      //       return PlayerIcon(
-      //         display: team[index],
-      //         size: 44,
-      //         onPressed: () => removeFromTeam(team, team[index]),
-      //       );
-      //     },
-      //   ),
-      // ),
     );
   }
 
