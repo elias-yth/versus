@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:versus/models/player.dart';
 import 'package:versus/services/firestore.dart';
 import 'package:versus/styles/colors.dart';
@@ -135,7 +136,23 @@ class _MatchupPageState extends State<MatchupPage> {
       child: SizedBox(
         height: 400,
         width: 350,
-        child: PlayerGrid(players: playerPool, onPlayerTap: addToMatchup),
+        child: PlayerGrid(
+          players: playerPool,
+          onPlayerTap: addToMatchup,
+          onAddPressed: () async {
+            final newPlayer = await addPlayerDialog(
+              context,
+              firestoreService,
+              textController,
+            );
+
+            if (newPlayer != null) {
+              setState(() {
+                playerPool.insert(0, newPlayer); // Insert at the beginning
+              });
+            }
+          },
+        ),
       ),
     );
   }
