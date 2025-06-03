@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 import 'package:versus/models/player.dart';
 import 'package:versus/services/firestore.dart';
 import 'package:versus/styles/colors.dart';
@@ -13,11 +12,7 @@ import 'package:versus/widgets/player_icon_widget.dart';
 
 class MatchupPage extends StatefulWidget {
   final List<Player> players;
-  const MatchupPage({
-    super.key,
-    // required List<Player> players,
-    required this.players,
-  });
+  const MatchupPage({super.key, required this.players});
 
   @override
   State<MatchupPage> createState() => _MatchupPageState();
@@ -49,7 +44,6 @@ class _MatchupPageState extends State<MatchupPage> {
   void addToMatchup(Player player) {
     if (!isTeamFull(teamOne)) {
       setState(() {
-        print('tried adding player to teamOne');
         teamOne.add(player);
         playerPool.remove(player);
       });
@@ -58,15 +52,14 @@ class _MatchupPageState extends State<MatchupPage> {
         teamTwo.add(player);
         playerPool.remove(player);
       });
-    } else {
-      print('team already full');
     }
   }
 
-  // TODO: ADD PLAYER TO START OF PLAYERPOOL LIST
+  void editPlayer(Player player) {}
+
   void removeFromTeam(List<Player> team, Player player) {
     setState(() {
-      playerPool.add(player);
+      playerPool.insert(0, player);
       team.remove(player);
     });
   }
@@ -99,7 +92,6 @@ class _MatchupPageState extends State<MatchupPage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 100.0),
               child: BigButton(
-                // TODO: update 'lastPlayed' property for players in teamOne and teamTwo
                 onPressed: () {
                   Navigator.pushNamed(context, '/test');
                 },
@@ -138,7 +130,8 @@ class _MatchupPageState extends State<MatchupPage> {
         width: 350,
         child: PlayerGrid(
           players: playerPool,
-          onPlayerTap: addToMatchup,
+          onPressed: addToMatchup,
+          onLongPress: editPlayer,
           onAddPressed: () async {
             final newPlayer = await addPlayerDialog(
               context,

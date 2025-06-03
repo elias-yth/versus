@@ -42,3 +42,41 @@ Future<Player?> addPlayerDialog(
         ),
   );
 }
+
+Future<Player?> editPlayer(
+  BuildContext context,
+  FirestoreService firestoreService,
+  TextEditingController textController,
+) async {
+  final nameController = textController;
+  return showDialog<Player>(
+    context: context,
+    builder:
+        (context) => AlertDialog(
+          content: TextField(
+            controller: nameController,
+            style: const TextStyle(fontFamily: 'Roboto'),
+            decoration: const InputDecoration(hintText: 'Enter player name'),
+          ),
+          actions: [
+            BigButton(
+              onPressed: () async {
+                final name = nameController.text.trim();
+                if (name.isNotEmpty) {
+                  final newPlayer = Player(
+                    id: const Uuid().v4(),
+                    name: name,
+                    createdAt: DateTime.now(),
+                  );
+
+                  await firestoreService.createPlayer(newPlayer);
+                  nameController.clear();
+                  Navigator.pop(context, newPlayer); // <- return player
+                }
+              },
+              child: H4('add player'),
+            ),
+          ],
+        ),
+  );
+}

@@ -5,6 +5,7 @@ import 'package:versus/styles/typography.dart';
 class PlayerIcon extends StatelessWidget {
   final String display;
   final VoidCallback onPressed;
+  final VoidCallback? onLongPress;
   final double? size;
   final Widget? child;
   const PlayerIcon({
@@ -13,6 +14,7 @@ class PlayerIcon extends StatelessWidget {
     this.child,
     required this.onPressed,
     this.size,
+    this.onLongPress,
   });
 
   @override
@@ -22,8 +24,8 @@ class PlayerIcon extends StatelessWidget {
     double totalHeight = iconSize + subTextHeight;
 
     return TextButton(
-      // TODO: find solution for add button
       onPressed: onPressed,
+      onLongPress: onLongPress ?? null,
       child: SizedBox(
         height: totalHeight,
         width: iconSize,

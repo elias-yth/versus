@@ -4,7 +4,8 @@ import 'package:versus/widgets/player_icon_widget.dart';
 
 class PlayerGrid extends StatelessWidget {
   final List<Player> players;
-  final void Function(Player player) onPlayerTap;
+  final void Function(Player player) onPressed;
+  final void Function(Player player)? onLongPress;
   final VoidCallback? onAddPressed;
   final String addLabel;
   final double height;
@@ -14,7 +15,8 @@ class PlayerGrid extends StatelessWidget {
   const PlayerGrid({
     super.key,
     required this.players,
-    required this.onPlayerTap,
+    required this.onPressed,
+    this.onLongPress,
     this.onAddPressed,
     this.addLabel = '+',
     this.height = 400,
@@ -30,6 +32,7 @@ class PlayerGrid extends StatelessWidget {
       height: height,
       width: width,
       child: GridView.builder(
+        physics: NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: crossAxisCount,
         ),
@@ -44,7 +47,8 @@ class PlayerGrid extends StatelessWidget {
 
           return PlayerIcon(
             display: player.name,
-            onPressed: () => onPlayerTap(player),
+            onPressed: () => onPressed(player),
+            onLongPress: () => onLongPress!(player),
           );
         },
       ),

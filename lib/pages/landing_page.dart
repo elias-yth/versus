@@ -33,13 +33,12 @@ class _LandingPageState extends State<LandingPage> {
         });
       }
     } catch (e) {
-      print('Error loading players: $e');
+      // print('Error loading players: $e');
     }
   }
 
   void _onGetStartedPressed() {
     if (_players == null) {
-      print('Players not loaded yet!');
       return;
     }
 
